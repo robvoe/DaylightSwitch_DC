@@ -62,14 +62,7 @@ static void MX_CRC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-volatile uint16_t buffer[4];
-volatile uint32_t has_finished = 0;
-
-
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-	HAL_ADC_Stop_DMA(hadc);
-	has_finished = 1;
-}
+extern void doCpp(void);
 /* USER CODE END 0 */
 
 /**
@@ -79,7 +72,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	// Enable clock cycle counter. Inquiring the counter value can be accomplished using "DWT->CYCCNT"
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+	DWT->CYCCNT = 0;
+	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -106,9 +102,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  HAL_Delay(30);
-  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
-  HAL_Delay(10);
+
+  doCpp();  // --> This function should never return..
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -190,7 +187,7 @@ static void MX_ADC1_Init(void)
   /** Common config 
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
