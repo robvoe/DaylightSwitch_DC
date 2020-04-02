@@ -42,6 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 CRC_HandleTypeDef hcrc;
 
@@ -52,15 +53,23 @@ CRC_HandleTypeDef hcrc;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
-extern void doCpp(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+volatile uint16_t buffer[4];
+volatile uint32_t has_finished = 0;
 
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
+	HAL_ADC_Stop_DMA(hadc);
+	has_finished = 1;
+}
 /* USER CODE END 0 */
 
 /**
@@ -72,7 +81,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -92,12 +100,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 
 
-  doCpp();
+  HAL_Delay(30);
+  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+  HAL_Delay(10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -179,15 +190,16 @@ static void MX_ADC1_Init(void)
   /** Common config 
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.NbrOfConversion = 4;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.NbrOfDiscConversion = 1;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.DMAContinuousRequests = DISABLE;
@@ -262,7 +274,6 @@ static void MX_CRC_Init(void)
 
   /* USER CODE END CRC_Init 1 */
   hcrc.Instance = CRC;
-  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
   hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
   hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
   hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
@@ -274,6 +285,22 @@ static void MX_CRC_Init(void)
   /* USER CODE BEGIN CRC_Init 2 */
 
   /* USER CODE END CRC_Init 2 */
+
+}
+
+/** 
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void) 
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 
 }
 
@@ -362,7 +389,7 @@ void Error_Handler(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(char *file, uint32_t line)
+void assert_failed(uint8_t *file, uint32_t line)
 { 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,

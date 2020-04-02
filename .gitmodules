@@ -1,3 +1,0 @@
-[submodule "DaylightSwitch_DC/SW4STM32/DaylightSwitch_DC/Application/User/Util"]
-	path = DaylightSwitch_DC/SW4STM32/DaylightSwitch_DC/Application/User/Util
-	url = https://github.com/robvoe/embedded-util.git
