@@ -33,12 +33,12 @@ namespace Hardware {
 
 			/// Various fields
 			static AdcConfig *_adcConfig;
-			static uint32_t   _collectedMeasurementsCount;
+			static uint32_t   _collectedMeasurementsCount;      	///< Counts performed measurements. IMPORTANT: Overflow must be considered when using this value!
 
 
 			/// Raw measuring results
-			static constexpr uint32_t MEASURINGS_CHANNEL_COUNT { 4 };  	///< Channels:   Relay voltage, Supply voltage, Photo voltage, Internal voltage reference
-			static volatile uint16_t _rawDigitsMeasurings[MEASURINGS_CHANNEL_COUNT];
+			static constexpr uint32_t MeasuringChannelCount { 4 };  	///< Channels:   Relay voltage, Supply voltage, Photo voltage, Internal voltage reference
+			static volatile uint16_t _rawDigitsMeasurings[MeasuringChannelCount];
 
 			/// Measurings that were already converted to physical units, but no correction calculations applied yet.
 			static float _uncorrectedMeasuring_RelayVoltage;      	///< Holds the voltage of the relay voltage rail (typically approx. 7..8 volts)
@@ -52,10 +52,10 @@ namespace Hardware {
 			static float _correctedMeasuring_PhotoVoltage;         	///< Photo input voltage.
 
 			/// Average filter instances
-			static constexpr uint32_t AVERAGE_FILTER_SIZE { 8 };
-			static Util::Filters::Moving::MovingAverageFilter<float, AVERAGE_FILTER_SIZE>  _averageFilter_RelayVoltage;
-			static Util::Filters::Moving::MovingAverageFilter<float, AVERAGE_FILTER_SIZE>  _averageFilter_SupplyVoltage;
-			static Util::Filters::Moving::MovingAverageFilter<float, AVERAGE_FILTER_SIZE>  _averageFilter_PhotoVoltage;
+			static constexpr uint32_t AverageFilterSize { 16 };
+			static Util::Filters::Moving::MovingAverageFilter<float, AverageFilterSize>  _averageFilter_RelayVoltage;
+			static Util::Filters::Moving::MovingAverageFilter<float, AverageFilterSize>  _averageFilter_SupplyVoltage;
+			static Util::Filters::Moving::MovingAverageFilter<float, AverageFilterSize>  _averageFilter_PhotoVoltage;
 
 
 		public:
@@ -73,11 +73,11 @@ namespace Hardware {
 			static void main();
 
 			/**
-			 * Blocks until enough measurements were collected so that the measurement filters can be called "flushed".
+			 * Waits until the filters are filled-up with completely new data.
 			 *
-			 * @param timeout The amount of milliseconds until timeout.
+			 * @param timeout  ..  The maximum time [ms] this function is allowed to block. A value of 0 disables the timeout; the function may block indefinitely.
 			 */
-			static void flushFilters( uint32_t timeout = UINT32_C( 100 ) );
+			static void flushFilters( uint32_t timeout = UINT32_C( 200 ) );
 
 			/**
 			 * Returns if there are already valid measurings present. Will only return 'false' right after initializing this module.

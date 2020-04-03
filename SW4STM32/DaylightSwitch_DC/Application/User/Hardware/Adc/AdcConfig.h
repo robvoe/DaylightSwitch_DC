@@ -1,16 +1,12 @@
 /*
  * AdcConfig.h
  *
- *  Created on: 24.11.2018
- *      Author: Robert
- *
- *  Versioning information:
- *    + $LastChangedDate$
- *    + $Rev$
- *    + $Author$
+ *  Created on: 30.03.2020
+ *      Author: Robert Voelckner
  *
  *  Description:
- *    ...
+ *  	Defines the user configuration of the Adc module. It will be managed by the Persistence module during
+ *  	runtime ─ thus, as initiated by the application, all values are stored in Flash memory.
  */
 #ifndef APPLICATION_USER_ADC_ADCCONFIG_H_
 #define APPLICATION_USER_ADC_ADCCONFIG_H_

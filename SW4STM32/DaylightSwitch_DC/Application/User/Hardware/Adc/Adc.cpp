@@ -29,7 +29,7 @@ namespace Hardware {
 	// Class fields
 	AdcConfig *Adc::_adcConfig;
 
-	volatile uint16_t Adc::_rawDigitsMeasurings[Adc::MEASURINGS_CHANNEL_COUNT];
+	volatile uint16_t Adc::_rawDigitsMeasurings[Adc::MeasuringChannelCount];
 
 	uint32_t Adc::_collectedMeasurementsCount;
 
@@ -41,9 +41,9 @@ namespace Hardware {
 	float Adc::_correctedMeasuring_SupplyVoltage;
 	float Adc::_correctedMeasuring_PhotoVoltage;
 
-	MovingAverageFilter<float, Adc::AVERAGE_FILTER_SIZE>  Adc::_averageFilter_RelayVoltage(0.0f);
-	MovingAverageFilter<float, Adc::AVERAGE_FILTER_SIZE>  Adc::_averageFilter_SupplyVoltage(0.0f);
-	MovingAverageFilter<float, Adc::AVERAGE_FILTER_SIZE>  Adc::_averageFilter_PhotoVoltage(0.0f);
+	MovingAverageFilter<float, Adc::AverageFilterSize>  Adc::_averageFilter_RelayVoltage(0.0f);
+	MovingAverageFilter<float, Adc::AverageFilterSize>  Adc::_averageFilter_SupplyVoltage(0.0f);
+	MovingAverageFilter<float, Adc::AverageFilterSize>  Adc::_averageFilter_PhotoVoltage(0.0f);
 
 
 
@@ -104,7 +104,7 @@ namespace Hardware {
 				_collectedMeasurementsCount++;
 			}
 
-			HAL_ADC_Start_DMA( &hadc1, (uint32_t*)_rawDigitsMeasurings, Adc::MEASURINGS_CHANNEL_COUNT );
+			HAL_ADC_Start_DMA( &hadc1, (uint32_t*)_rawDigitsMeasurings, Adc::MeasuringChannelCount );
 		}
 	}
 
@@ -128,16 +128,15 @@ namespace Hardware {
 	void Adc::flushFilters( uint32_t timeout ) {
 		const uint32_t startedAtTime = HAL_GetTick();
 		const uint32_t startedAtMeasurementsCount = _collectedMeasurementsCount;
-		const uint32_t targetedMeasurementsCount = startedAtMeasurementsCount + 3; // TODO Adapt this value to implemented filters
 		while ( true ) {
 			Adc::main();
 			if ( timeout && (HAL_GetTick() - startedAtTime) > timeout ) return;
-			if ( (_collectedMeasurementsCount - startedAtMeasurementsCount) > targetedMeasurementsCount ) return;
+			if ( (_collectedMeasurementsCount - startedAtMeasurementsCount) > AverageFilterSize ) return;
 		}
 	}
 
 	bool Adc::isValidMeasurings() {
-		return (_collectedMeasurementsCount != 0);
+		return !_averageFilter_SupplyVoltage.containsEmptyElements();  // We could have chosen any of the other filters here instead..
 	}
 
 
