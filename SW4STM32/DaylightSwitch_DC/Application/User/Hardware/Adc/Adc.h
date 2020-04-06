@@ -77,7 +77,7 @@ namespace Hardware {
 			 *
 			 * @param timeout  ..  The maximum time [ms] this function is allowed to block. A value of 0 disables the timeout; the function may block indefinitely.
 			 */
-			static void flushFilters( uint32_t timeout = UINT32_C( 200 ) );
+			static void flushFilters( uint32_t timeout = UINT32_C( 400 ) );
 
 			/**
 			 * Returns if there are already valid measurings present. Will only return 'false' right after initializing this module.
