@@ -103,6 +103,13 @@ namespace Hardware {
 		_commandFifo.enqueue( cmd );
 	}
 
+	void RelayHandler::enqueueOpenCloseCommand(RelayState newState, CommandProcessedCallbackDefinition commandProcessedCallback) {
+		if ( newState == RelayState::Open )
+			enqueueOpenCommand(commandProcessedCallback);
+		else if ( newState == RelayState::Closed )
+			enqueueCloseCommand(commandProcessedCallback);
+	}
+
 	void RelayHandler::enqueueDelayCommand(uint32_t delayDuration, CommandProcessedCallbackDefinition commandProcessedCallback) {
 		if ( !delayDuration )
 			return;

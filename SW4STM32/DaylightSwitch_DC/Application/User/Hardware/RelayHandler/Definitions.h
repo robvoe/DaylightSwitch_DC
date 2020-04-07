@@ -21,6 +21,15 @@ namespace Hardware {
 		Indeterminate  	///< The relay was not set to a certain state, yet. Thus, it could be either open or closed.
 	};
 
+
+	/**
+	 * Inversion operator for RelayState.
+	 *
+	 * @param value  The value to be inversed.
+	 * @return  Returns the logical inverse of RelayState.
+	 */
+	extern RelayState operator!(RelayState value);
+
 } /*namespace Hardware*/
 
 

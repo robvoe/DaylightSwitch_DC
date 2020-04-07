@@ -25,9 +25,9 @@ namespace Hardware {
 
 
 	/** Internally used function. Calls, if possible, the brightness handler callback. */
-	void BrightnessHandler::invokeCallback(RelayState newRelayState) {
+	void BrightnessHandler::invokeCallback() {
 		StateChangedCallbackDefinition callback = _stateChangedCallback;
-		if ( callback != nullptr )   callback(newRelayState);
+		if ( callback != nullptr )   callback(RelayHandler::getRelayState());
 	}
 
 	void BrightnessHandler::init( BrightnessHandlerConfig *config ) {
@@ -52,13 +52,7 @@ namespace Hardware {
 		const bool comparatorStateChanged = _comparator.process(Adc::getFilteredMeasuring_PhotoVoltage());
 		if ( comparatorStateChanged ) {
 			const RelayState newRelayState = (_comparator.getState() == ComparatorState::High) ? RelayState::Closed : RelayState::Open;
-
-			if ( RelayHandler::getRelayState() != newRelayState ) {
-				if ( newRelayState == RelayState::Closed )
-					RelayHandler::enqueueCloseCommand( []{ invokeCallback(RelayState::Closed); } );
-				else /*if ( newRelayState == RelayState::Open ) */
-					RelayHandler::enqueueOpenCommand( []{ invokeCallback(RelayState::Open); } );
-			}
+			RelayHandler::enqueueOpenCloseCommand( newRelayState, invokeCallback );
 		}
 
 	}

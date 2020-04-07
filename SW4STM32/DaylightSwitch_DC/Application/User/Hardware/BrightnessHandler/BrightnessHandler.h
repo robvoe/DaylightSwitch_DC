@@ -32,10 +32,8 @@ namespace Hardware {
 
 			/**
 			 * Internally used function. Calls, if possible, the 'brightness changed' callback.
-			 *
-			 * @param newState  ..  Contains the new relay state.
 			 */
-			static void invokeCallback(RelayState newState);
+			static void invokeCallback();
 
 		public:
 

@@ -86,6 +86,15 @@ namespace Hardware {
 			static void enqueueCloseCommand(CommandProcessedCallbackDefinition commandProcessedCallback = nullptr);
 
 			/**
+			 * Generalizes both previous methods.
+			 *
+			 * @param newState                  ..  New desired RelayState. Only RelayState::Open and RelayState::Closed are allowed.
+			 * @param commandProcessedCallback  ..  Will be called after the command was successfully executed. If nullptr,
+			 *                                	  	no callback will be invoked.
+			 */
+			static void enqueueOpenCloseCommand(RelayState newState, CommandProcessedCallbackDefinition commandProcessedCallback = nullptr);
+
+			/**
 			 * Enqueues the command "close relay" - which will be executed by the main() function.
 			 *
 			 * @param delayDuration           	..	The amount of milliseconds.

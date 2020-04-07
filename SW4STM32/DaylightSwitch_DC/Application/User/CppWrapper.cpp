@@ -51,6 +51,9 @@ PersistentStorage<BrightnessHandlerConfig>   brightnessConfig(BrightnessHandlerC
 //}
 
 
+void handleHoldImpulse(Button& button);
+void handleButtonUp(Button& button);
+
 
 
 extern "C" void doCpp(void) {
@@ -63,22 +66,7 @@ extern "C" void doCpp(void) {
 	Adc::init(&adcConfig);
 	RelayHandler::init(&relayHandlerConfig);
 	BrightnessHandler::init(&brightnessConfig);
-	Button  button(TASTER_GPIO_Port, TASTER_Pin, GPIO_PinState::GPIO_PIN_SET, true, [](Button& button){
-		/* ButtonDown handler */
-		if ( !button.State.isHoldImpulse() )  return;
-		const float currentVoltage = Adc::getFilteredMeasuring_PhotoVoltage();
-		const float hysteresis = brightnessConfig->HysteresisVoltage;
-		brightnessConfig->CompareVoltage = currentVoltage + hysteresis / 2;
-		brightnessConfig.saveToFlash();
-	}, [](Button& button){
-		/* ButtonUp handler */
-		const RelayState newRelayState = (RelayHandler::getRelayState() == RelayState::Closed) ? RelayState::Open : RelayState::Closed;
-		if ( newRelayState == RelayState::Closed )
-			RelayHandler::enqueueCloseCommand();
-		else /*if ( newRelayState == RelayState::Open )*/
-			RelayHandler::enqueueOpenCommand();
-	});
-	//Util::Comparators::RisingComparator<float> brightnessComparator(brightnessConfig->CompareVoltage, brightnessConfig->HysteresisVoltage, Util::Comparators::ComparatorState::Undefined);
+	Button  button(TASTER_GPIO_Port, TASTER_Pin, GPIO_PinState::GPIO_PIN_SET, true, handleHoldImpulse, handleButtonUp);
 
 
 	// Main loop
@@ -87,16 +75,31 @@ extern "C" void doCpp(void) {
 		RelayHandler::main();
 		BrightnessHandler::main();
 		button.main();
-
-
-//		if ( Adc::isValidMeasurings()  &&  brightnessComparator.process(Adc::getFilteredMeasuring_PhotoVoltage()) ) {
-//			// The comparator state changed, handle the event..
-//			const Util::Comparators::State state = brightnessComparator.getState();
-//			if ( state == Util::Comparators::State::High  &&  RelayHandler::getRelayState() != RelayState::Closed )
-//				RelayHandler::enqueueCloseCommand();
-//			else if ( state == Util::Comparators::State::Low  &&  RelayHandler::getRelayState() != RelayState::Open )
-//				RelayHandler::enqueueOpenCommand();
-//		}
 	}
 }
+
+
+void handleHoldImpulse(Button& button) {
+	if ( !button.State.isHoldImpulse() )  return;
+	const float currentVoltage = Adc::getFilteredMeasuring_PhotoVoltage();
+	const float hysteresis = brightnessConfig->HysteresisVoltage;
+	brightnessConfig->CompareVoltage = currentVoltage + hysteresis / 2;
+	brightnessConfig.saveToFlash();
+
+	// Now give feedback by switching the relay several times
+	RelayState relayState = RelayHandler::getRelayState();
+	for ( uint32_t i = 0; i<4; i++ ) {
+		relayState = !relayState;
+		RelayHandler::enqueueOpenCloseCommand(relayState);
+		RelayHandler::enqueueDelayCommand(600);
+	}
+}
+
+
+void handleButtonUp(Button& button) {
+	const RelayState newRelayState = !RelayHandler::getRelayState();
+	RelayHandler::enqueueOpenCloseCommand(newRelayState);
+}
+
+
 
