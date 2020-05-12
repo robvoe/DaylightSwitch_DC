@@ -40,9 +40,10 @@ namespace Hardware {
 			/**
 			 * Initializes the BrightnessHandler module.
 			 *
-			 * @param config  	..	Contains the configuration. Must not be null!
+			 * @param config                ..  Contains the configuration. Must not be null!
+			 * @param stateChangedCallback  ..  May hold a callback that gets called as soon as the relay state changes due to change in brightness. May be null.
 			 */
-			static void init( BrightnessHandlerConfig *config );
+			static void init( BrightnessHandlerConfig *config, StateChangedCallbackDefinition stateChangedCallback = nullptr );
 
 			/**
 			 * Main function of the BrightnessHandler module. Must be called cyclically from main loop.
@@ -50,7 +51,7 @@ namespace Hardware {
 			static void main();
 
 			/**
-			 * Assigns the StateChangedCallback which will be called as soon as the relay state changes due to brightness change.
+			 * Assigns the StateChangedCallback which will be called as soon as the relay state changes due to change in brightness.
 			 *
 			 * @remarks The callback will be called as soon as the relay state ACTUALLY CHANGED.
 			 *
