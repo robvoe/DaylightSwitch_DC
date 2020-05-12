@@ -100,6 +100,7 @@ void handleHoldImpulse(Button& button) {
 void handleButtonUp(Button& button) {
 	const RelayState newRelayState = !RelayHandler::getRelayState();
 	RelayHandler::enqueueOpenCloseCommand(newRelayState);
+	handleRelayChangeDueToBrightness(newRelayState);
 }
 
 

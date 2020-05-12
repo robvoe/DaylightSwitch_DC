@@ -49,7 +49,7 @@ namespace Hardware {
 
 
 			/// Constants
-			static constexpr float MinimumVoltage = 6.6f;             	///< The minimum voltage necessary for opening/closing the relay
+			static constexpr float MinimumVoltage = 7.0f;             	///< The minimum voltage necessary for opening/closing the relay
 			static constexpr uint32_t CurrentFlowMillis = 30;         	///< The amount of milliseconds current will flow through the relay when opening/closing
 
 		public:
