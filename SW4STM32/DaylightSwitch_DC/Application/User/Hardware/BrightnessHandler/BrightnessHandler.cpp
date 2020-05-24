@@ -19,7 +19,7 @@ namespace Hardware {
 
 	#define CLOSE_RELAY  1
 	#define OPEN_RELAY   2
-	#define BRIGHT       OPEN_RELAY
+	#define BRIGHT       CLOSE_RELAY
 
 
 

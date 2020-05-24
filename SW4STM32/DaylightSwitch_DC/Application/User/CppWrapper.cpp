@@ -51,8 +51,8 @@ void handleRelayChangeDueToBrightness(RelayState newRelayState);
 
 
 
-#define OPEN_RELAY_TIMER_MINUTES  180 * (60 * 1000)
-SoftTimer  openRelayTimer(OPEN_RELAY_TIMER_MINUTES, false, handleOpenRelayTimer);
+#define OPEN_RELAY_TIMER_MINUTES  0 * (60 * 1000) /*TODO*/
+static SoftTimer  openRelayTimer(OPEN_RELAY_TIMER_MINUTES, false, handleOpenRelayTimer);
 
 
 extern "C" void doCpp(void) {
@@ -82,9 +82,7 @@ extern "C" void doCpp(void) {
 
 void handleHoldImpulse(Button& button) {
 	if ( !button.State.isHoldImpulse() )  return;
-	const float currentVoltage = Adc::getFilteredMeasuring_PhotoVoltage();
-	const float hysteresis = brightnessConfig->HysteresisVoltage;
-	brightnessConfig->CompareVoltage = currentVoltage + hysteresis / 2;
+	brightnessConfig->deduceCompareVoltage(Adc::getFilteredMeasuring_PhotoVoltage());
 	brightnessConfig.saveToFlash();
 
 	// Now give feedback by switching the relay several times
@@ -92,7 +90,7 @@ void handleHoldImpulse(Button& button) {
 	for ( uint32_t i = 0; i<4; i++ ) {
 		relayState = !relayState;
 		RelayHandler::enqueueOpenCloseCommand(relayState);
-		RelayHandler::enqueueDelayCommand(600);
+		RelayHandler::enqueueDelayCommand(700);
 	}
 }
 

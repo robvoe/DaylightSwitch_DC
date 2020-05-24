@@ -21,6 +21,9 @@ namespace Hardware {
 			static constexpr float InitialCompareVoltage = 0.6f;
 			static constexpr float InitialHysteresisVoltage = 0.4f;
 
+			static constexpr float MinSwitchBackVoltage = 0.05f;  // Should be slightly higher than the OpAmp's lower rail voltage.
+			static constexpr float MaxCompareVoltage = 3.25f;
+
 		public:
 			float CompareVoltage;
 			float HysteresisVoltage;
@@ -33,6 +36,27 @@ namespace Hardware {
 			static void ResetData(BrightnessHandlerConfig &instance) {
 				instance.CompareVoltage = InitialCompareVoltage;
 				instance.HysteresisVoltage = InitialHysteresisVoltage;
+			}
+
+			/**
+			 * Deduces and sets the field @see CompareVoltage
+			 *
+			 * @param currentVoltage  ..  Contains the currently present (brightness) voltage.
+			 */
+			void deduceCompareVoltage(float currentVoltage) {
+				CompareVoltage = currentVoltage + HysteresisVoltage / 2.0f;
+
+				// Check if "switch back" voltage is too low
+				const float switchBackVoltage = CompareVoltage - HysteresisVoltage;
+				if (switchBackVoltage < MinSwitchBackVoltage) {
+					const float delta = MinSwitchBackVoltage - switchBackVoltage;
+					CompareVoltage += delta;  // Shift CompareVoltage up by the delta so it is always possible to switch back
+				}
+
+				// Check if CompareVoltage is too high
+				if (CompareVoltage > MaxCompareVoltage) {
+					CompareVoltage = MaxCompareVoltage;
+				}
 			}
 	};
 
