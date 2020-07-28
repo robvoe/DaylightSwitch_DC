@@ -1,0 +1,4 @@
+[submodule "User/Util"]
+	path = User/Util
+	url = https://github.com/robvoe/embedded-util.git
+	branch = master
