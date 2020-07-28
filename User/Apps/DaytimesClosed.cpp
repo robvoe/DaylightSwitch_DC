@@ -13,4 +13,8 @@
 
 namespace Apps {
 
+	void DaytimesClosed::handleBrightnessComparatorEvent( Util::Comparators::ComparatorState newComparatorState ) {
+
+	}
+
 } /* namespace Apps */

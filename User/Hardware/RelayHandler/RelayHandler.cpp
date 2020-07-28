@@ -14,6 +14,7 @@
 
 #include <IncludeStmHal.h>
 #include <main.h>                    // Necessary for the pin/port constants
+#include <Stm32/SwoLogger/SwoLogger.h>
 
 
 namespace Hardware {
@@ -77,6 +78,7 @@ namespace Hardware {
 					HAL_GPIO_WritePin( RELAY_CLOSE_GPIO_Port, RELAY_CLOSE_Pin, GPIO_PIN_RESET );
 					HAL_GPIO_WritePin( RELAY_OPEN_GPIO_Port, RELAY_OPEN_Pin, GPIO_PIN_RESET );
 					_currentRelayState = (nextCommand->Command == RelayCommand::Command::Open) ? RelayState::Open : RelayState::Closed;
+					Stm32::SwoLogger::info((nextCommand->Command == RelayCommand::Command::Open) ?  "New relay state: Open" : "New relay state: Closed");
 					postprocessRemoveCommand();
 				}
 			}

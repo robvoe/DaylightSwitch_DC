@@ -54,7 +54,7 @@ DaytimesClosed app{};
 
 
 void handleHoldImpulse(Button& button);
-void handleButtonUp(Button& button);
+//void handleButtonUp(Button& button);
 //void handleOpenRelayTimer();
 //void handleRelayChangeDueToBrightness(RelayState newRelayState);
 
@@ -73,8 +73,8 @@ extern "C" void doCpp(void) {
 	// Init all necessary modules
 	Adc::init(&adcConfig);
 	RelayHandler::init(&relayHandlerConfig);
-	BrightnessHandler::init(&brightnessConfig, nullptr);
-	Button     button(TASTER_GPIO_Port, TASTER_Pin, GPIO_PinState::GPIO_PIN_SET, true, handleHoldImpulse, handleButtonUp);
+	BrightnessHandler::init(&brightnessConfig, [](Util::Comparators::ComparatorState s){app.handleBrightnessComparatorEvent(s);});
+	Button  button(TASTER_GPIO_Port, TASTER_Pin, GPIO_PinState::GPIO_PIN_SET, true, handleHoldImpulse, [](Button&){app.handleButtonUp();});
 
 	// Main loop
 	while(1) {
@@ -103,12 +103,11 @@ void handleHoldImpulse(Button& button) {
 }
 
 
-void handleButtonUp(Button& button) {
-	//	const RelayState newRelayState = !RelayHandler::getRelayState();
-	//	RelayHandler::enqueueOpenCloseCommand(newRelayState);
-	//	handleRelayChangeDueToBrightness(newRelayState);
-	app.handleButtonUp();
-}
+//void handleButtonUp(Button& button) {
+//	const RelayState newRelayState = !RelayHandler::getRelayState();
+//	RelayHandler::enqueueOpenCloseCommand(newRelayState);
+//	handleRelayChangeDueToBrightness(newRelayState);
+//}
 
 
 //void handleOpenRelayTimer() {

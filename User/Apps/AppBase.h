@@ -42,17 +42,10 @@ namespace Apps {
 				using namespace Hardware;
 				const RelayState newRelayState = !RelayHandler::getRelayState();
 				RelayHandler::enqueueOpenCloseCommand(newRelayState);
-
-				// Do some logging
-				using namespace Stm32;
-				if ( newRelayState == RelayState::Open ) {
-					SwoLogger::info("Button up event. New relay state: Open");
-				} else {
-					SwoLogger::info("Button up event. New relay state: Closed");
-				}
+				Stm32::SwoLogger::info("Button up event");
 			}
 
-			virtual void handleBrightnessComparatorEvent( Util::Comparators::ComparatorState newComparatorState ) {}
+			virtual void handleBrightnessComparatorEvent( Util::Comparators::ComparatorState newComparatorState ) = 0;
 
 			/**
 			 * Destructor.

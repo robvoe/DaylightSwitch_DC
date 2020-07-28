@@ -41,6 +41,8 @@ namespace Apps {
 			
 			/********************************* GENERAL LOGIC *******************************/
 
+			void handleBrightnessComparatorEvent( Util::Comparators::ComparatorState newComparatorState ) override;
+
 			virtual ~DaytimesClosed() {}
 	};
 

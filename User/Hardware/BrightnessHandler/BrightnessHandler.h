@@ -20,15 +20,16 @@ namespace Hardware {
 	
 	class BrightnessHandler {
 		public:
-			typedef void (*StateChangedCallbackDefinition)(RelayState newState);
+			//typedef void (*StateChangedCallbackDefinition)(RelayState newState);
+			typedef void (*BrightnessComparatorEventCallbackDefinition)(Util::Comparators::ComparatorState);
 
 		private:
 			BrightnessHandler() = delete;
 			BrightnessHandler(const BrightnessHandler&) = delete;
 
-			static StateChangedCallbackDefinition              _stateChangedCallback;
-			static BrightnessHandlerConfig                    *_config;
-			static Util::Comparators::SingleComparator<float>  _comparator;
+			static BrightnessComparatorEventCallbackDefinition  _brightnessComparatorEventCallback;
+			static BrightnessHandlerConfig                     *_config;
+			static Util::Comparators::SingleComparator<float>   _comparator;
 
 			/**
 			 * Internally used function. Calls, if possible, the 'brightness changed' callback.
@@ -40,24 +41,22 @@ namespace Hardware {
 			/**
 			 * Initializes the BrightnessHandler module.
 			 *
-			 * @param config                ..  Contains the configuration. Must not be null!
-			 * @param stateChangedCallback  ..  May hold a callback that gets called as soon as the relay state changes due to change in brightness. May be null.
+			 * @param config                             ..  Contains the configuration. Must not be null!
+			 * @param brightnessComparatorEventCallback  ..  May hold a callback that gets called as soon as the brightness comparator output changes. May be nullptr.
 			 */
-			static void init( BrightnessHandlerConfig *config, StateChangedCallbackDefinition stateChangedCallback = nullptr );
+			static void init( BrightnessHandlerConfig *config, BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback = nullptr );
 
 			/**
-			 * Main function of the BrightnessHandler module. Must be called cyclically from main loop.
+			 * Main function of the BrightnessComparatorHandler module. Must be called cyclically from main loop.
 			 */
 			static void main();
 
 			/**
-			 * Assigns the StateChangedCallback which will be called as soon as the relay state changes due to change in brightness.
+			 * Assigns the BrightnessComparatorEventCallback which will be called as soon as the brightness comparator output changes.
 			 *
-			 * @remarks The callback will be called as soon as the relay state ACTUALLY CHANGED.
-			 *
-			 * @param stateChangedCallback	..	The callback function. May be null.
+			 * @param brightnessComparatorEventCallback	..	The callback function. May be null.
 			 */
-			static void setStateChangedCallback(StateChangedCallbackDefinition stateChangedCallback);
+			static void setBrightnessComparatorEventCallback(BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback);
 
 			/**
 			 * Returns the brightness comparator state.

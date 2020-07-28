@@ -17,28 +17,16 @@
 
 namespace Hardware {
 
-	#define CLOSE_RELAY  1
-	#define OPEN_RELAY   2
-	#define BRIGHT       CLOSE_RELAY
-
-
-
-	BrightnessHandler::StateChangedCallbackDefinition BrightnessHandler::_stateChangedCallback = nullptr;
-	BrightnessHandlerConfig                          *BrightnessHandler::_config = nullptr;
-	Util::Comparators::SingleComparator<float>        BrightnessHandler::_comparator(0.0f, 0.0f, Util::Comparators::ComparatorState::Undefined);
+	BrightnessHandler::BrightnessComparatorEventCallbackDefinition BrightnessHandler::_brightnessComparatorEventCallback = nullptr;
+	BrightnessHandlerConfig                                       *BrightnessHandler::_config = nullptr;
+	Util::Comparators::SingleComparator<float>                     BrightnessHandler::_comparator(0.0f, 0.0f, Util::Comparators::ComparatorState::Undefined);
 
 	using namespace Util::Comparators;
 
 
-	/** Internally used function. Calls, if possible, the brightness handler callback. */
-	void BrightnessHandler::invokeCallback() {
-		volatile const StateChangedCallbackDefinition callback = _stateChangedCallback;
-		if ( callback != nullptr )   callback(RelayHandler::getRelayState());
-	}
-
-	void BrightnessHandler::init( BrightnessHandlerConfig *config, StateChangedCallbackDefinition stateChangedCallback ) {
+	void BrightnessHandler::init( BrightnessHandlerConfig *config, BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback ) {
 		_config = config;
-		_stateChangedCallback = stateChangedCallback;
+		_brightnessComparatorEventCallback = brightnessComparatorEventCallback;
 		_comparator.CompareValue = config->CompareVoltage;
 		_comparator.CompareHysteresis = config->HysteresisVoltage;
 	}
@@ -57,19 +45,14 @@ namespace Hardware {
 
 		const bool comparatorStateChanged = _comparator.process(Adc::getFilteredMeasuring_PhotoVoltage());
 		if ( comparatorStateChanged ) {
-			const RelayState newRelayState =
-			#if BRIGHT == CLOSE_RELAY
-				(_comparator.getState() == ComparatorState::High) ? RelayState::Closed : RelayState::Open;
-			#elif BRIGHT == OPEN_RELAY
-				(_comparator.getState() == ComparatorState::High) ? RelayState::Open : RelayState::Closed;
-			#endif
-			RelayHandler::enqueueOpenCloseCommand( newRelayState, invokeCallback );
+			volatile BrightnessComparatorEventCallbackDefinition callback = _brightnessComparatorEventCallback;
+			if ( callback != nullptr )  callback( _comparator.getState() );
 		}
 
 	}
 
-	void BrightnessHandler::setStateChangedCallback(BrightnessHandler::StateChangedCallbackDefinition stateChangedCallback) {
-		_stateChangedCallback = stateChangedCallback;
+	void BrightnessHandler::setBrightnessComparatorEventCallback(BrightnessHandler::BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback) {
+		_brightnessComparatorEventCallback = brightnessComparatorEventCallback;
 	}
 
 	Util::Comparators::ComparatorState BrightnessHandler::getComparatorState() {
