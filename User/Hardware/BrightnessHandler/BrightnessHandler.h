@@ -10,11 +10,11 @@
 #ifndef APPLICATION_USER_HARDWARE_BRIGHTNESSHANDLER_BRIGHTNESSHANDLER_H_
 #define APPLICATION_USER_HARDWARE_BRIGHTNESSHANDLER_BRIGHTNESSHANDLER_H_
 
+#include <Comparators/SingleComparator.h>
 #include "BrightnessHandlerConfig.h"
 
 #include "../RelayHandler/Definitions.h"
 
-#include <Comparators/RisingComparator.h>
 
 namespace Hardware {
 	
@@ -28,7 +28,7 @@ namespace Hardware {
 
 			static StateChangedCallbackDefinition              _stateChangedCallback;
 			static BrightnessHandlerConfig                    *_config;
-			static Util::Comparators::RisingComparator<float>  _comparator;
+			static Util::Comparators::SingleComparator<float>  _comparator;
 
 			/**
 			 * Internally used function. Calls, if possible, the 'brightness changed' callback.

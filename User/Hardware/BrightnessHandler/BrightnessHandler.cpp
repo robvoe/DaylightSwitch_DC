@@ -12,7 +12,7 @@
 
 #include "BrightnessHandler.h"
 
-#include <Comparators/RisingComparator.h>
+#include <Comparators/SingleComparator.h>
 #include <Mutex/ArmInterruptPreventionMutex.h>
 
 namespace Hardware {
@@ -25,7 +25,7 @@ namespace Hardware {
 
 	BrightnessHandler::StateChangedCallbackDefinition BrightnessHandler::_stateChangedCallback = nullptr;
 	BrightnessHandlerConfig                          *BrightnessHandler::_config = nullptr;
-	Util::Comparators::RisingComparator<float>        BrightnessHandler::_comparator(0.0f, 0.0f, Util::Comparators::ComparatorState::Undefined);
+	Util::Comparators::SingleComparator<float>        BrightnessHandler::_comparator(0.0f, 0.0f, Util::Comparators::ComparatorState::Undefined);
 
 	using namespace Util::Comparators;
 

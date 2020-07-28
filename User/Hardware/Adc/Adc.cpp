@@ -13,6 +13,7 @@
 #include "Adc.h"
 
 #include <IncludeStmHal.h>
+#include <Stm32/SwoLogger/SwoLogger.h>
 
 #include <Filters/Moving/MovingAverageFilter.h>
 
@@ -105,6 +106,18 @@ namespace Hardware {
 			}
 
 			HAL_ADC_Start_DMA( &hadc1, (uint32_t*)_rawDigitsMeasurings, Adc::MeasuringChannelCount );
+
+			// Debug outputs via SWO
+			// TODO Perhaps, we want to remove that..
+			if ( !_averageFilter_PhotoVoltage.containsEmptyElements() && !_averageFilter_SupplyVoltage.containsEmptyElements() ) {
+				static uint32_t inhibit = {0};
+				inhibit++;
+				if ( inhibit >= 19 ) {
+					inhibit = {9};
+					Stm32::SwoLogger::debug("V_photo ", _averageFilter_PhotoVoltage.getOutput());
+					Stm32::SwoLogger::debug("V_supply ", _averageFilter_SupplyVoltage.getOutput());
+				}
+			}
 		}
 	}
 

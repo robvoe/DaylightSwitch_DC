@@ -22,37 +22,47 @@
 #include <Stm32/Persistence/PersistentStorage.h>
 #include <Stm32/ButtonDriver/Button.h>
 #include <Stm32/SoftTimer/SoftTimer.h>
+#include <Stm32/SwoLogger/SwoLogger.h>
 
 // Include project specific modules
 #include "Hardware/Adc/Adc.h"
 #include "Hardware/RelayHandler/RelayHandler.h"
 #include "Hardware/BrightnessHandler/BrightnessHandler.h"
 
+// Include apps
+#include "Apps/AppBase.h"
+#include "Apps/DaytimesClosed.h"
+
 
 
 using namespace Hardware;
+using namespace Apps;
 using namespace Util::Stm32;
 using namespace Util::Stm32::Persistence;
 using namespace Util::Stm32::ButtonDriver;
 
 
 
-// Instanciate persistent storages
-PersistentStorage<AdcConfig>          adcConfig(AdcConfig::ResetData);
-PersistentStorage<RelayHandlerConfig> relayHandlerConfig(RelayHandlerConfig::ResetData);
+// Instantiate persistent storages
+PersistentStorage<AdcConfig>                 adcConfig(AdcConfig::ResetData);
+PersistentStorage<RelayHandlerConfig>        relayHandlerConfig(RelayHandlerConfig::ResetData);
 PersistentStorage<BrightnessHandlerConfig>   brightnessConfig(BrightnessHandlerConfig::ResetData);
+
+// Instantiate app
+DaytimesClosed app{};
 
 
 
 void handleHoldImpulse(Button& button);
 void handleButtonUp(Button& button);
-void handleOpenRelayTimer();
-void handleRelayChangeDueToBrightness(RelayState newRelayState);
+//void handleOpenRelayTimer();
+//void handleRelayChangeDueToBrightness(RelayState newRelayState);
 
 
 
-#define OPEN_RELAY_TIMER_MINUTES  0 * (60 * 1000) /*TODO*/
-static SoftTimer  openRelayTimer(OPEN_RELAY_TIMER_MINUTES, false, handleOpenRelayTimer);
+//#define OPEN_RELAY_TIMER_MINUTES  0 * (60 * 1000) /*TODO*/
+//static SoftTimer  openRelayTimer(OPEN_RELAY_TIMER_MINUTES, false, handleOpenRelayTimer);
+
 
 
 extern "C" void doCpp(void) {
@@ -60,22 +70,20 @@ extern "C" void doCpp(void) {
 	Util::Filters::Moving::MovingMedianFilterTest::performAllTests();
 	Util::Filters::Moving::MovingAverageFilterTest::performAllTests();
 
-
 	// Init all necessary modules
 	Adc::init(&adcConfig);
 	RelayHandler::init(&relayHandlerConfig);
-	BrightnessHandler::init(&brightnessConfig, handleRelayChangeDueToBrightness);
+	BrightnessHandler::init(&brightnessConfig, nullptr);
 	Button     button(TASTER_GPIO_Port, TASTER_Pin, GPIO_PinState::GPIO_PIN_SET, true, handleHoldImpulse, handleButtonUp);
-
-
 
 	// Main loop
 	while(1) {
 		Adc::main();
 		RelayHandler::main();
 		BrightnessHandler::main();
+		app.main();
 		button.main();
-		openRelayTimer.main();
+//		openRelayTimer.main();
 	}
 }
 
@@ -96,22 +104,23 @@ void handleHoldImpulse(Button& button) {
 
 
 void handleButtonUp(Button& button) {
-	const RelayState newRelayState = !RelayHandler::getRelayState();
-	RelayHandler::enqueueOpenCloseCommand(newRelayState);
-	handleRelayChangeDueToBrightness(newRelayState);
+	//	const RelayState newRelayState = !RelayHandler::getRelayState();
+	//	RelayHandler::enqueueOpenCloseCommand(newRelayState);
+	//	handleRelayChangeDueToBrightness(newRelayState);
+	app.handleButtonUp();
 }
 
 
-void handleOpenRelayTimer() {
-	openRelayTimer.disable();
-	RelayHandler::enqueueOpenCommand();
-}
+//void handleOpenRelayTimer() {
+//	openRelayTimer.disable();
+//	RelayHandler::enqueueOpenCommand();
+//}
 
 
 
-void handleRelayChangeDueToBrightness(RelayState newRelayState) {
-	if (newRelayState == RelayState::Closed)
-		openRelayTimer.enable();
-	else if (newRelayState == RelayState::Open)
-		openRelayTimer.disable();
-}
+//void handleRelayChangeDueToBrightness(RelayState newRelayState) {
+//	if (newRelayState == RelayState::Closed)
+//		openRelayTimer.enable();
+//	else if (newRelayState == RelayState::Open)
+//		openRelayTimer.disable();
+//}

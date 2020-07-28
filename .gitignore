@@ -78,6 +78,7 @@ $RECYCLE.BIN/
 
 ### System Workbench for STM32 (SW4STM32) ###
 Debug/
+Release/
 .settings/
 
 
