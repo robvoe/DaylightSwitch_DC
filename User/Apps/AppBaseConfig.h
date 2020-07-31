@@ -15,6 +15,8 @@
 #include <stdint-gcc.h>
 #include <type_traits>
 
+
+
 struct AppBaseConfig {
 		static constexpr float InitialCompareVoltage = 0.6f;
 		static constexpr float InitialHysteresisVoltage = 0.2f;

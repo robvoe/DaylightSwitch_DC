@@ -14,6 +14,8 @@
 
 #include "AppBase.h"
 
+#include <Stm32/SoftTimer/SoftTimer.h>
+
 namespace Apps {
 	
 	/**
@@ -26,13 +28,16 @@ namespace Apps {
 
 			/********************************** CONSTANTS **********************************/
 
+			static constexpr uint32_t  OpenRelayTimerMillis = 30 /*minutes*/ * (60 * 1000);
+			static constexpr bool      UseOpenRelayTimer = false;
+
 			/*********************************** FIELDS ************************************/
+
+			Util::Stm32::SoftTimer _openRelayTimer;
 
 			/********************************* CONSTRUCTORS ********************************/
 
-			DaytimesClosed(AppBaseConfig &appBaseConfig) : AppBase(appBaseConfig) {
-				// TODO
-			}
+			DaytimesClosed(AppBaseConfig &appBaseConfig);
 			
 			DaytimesClosed( const DaytimesClosed& other ) = delete;  // Copy constructor
 			DaytimesClosed( const DaytimesClosed&& other ) = delete; // Move constructor
@@ -42,6 +47,8 @@ namespace Apps {
 			/********************************* GENERAL LOGIC *******************************/
 
 			void handleBrightnessComparatorEvent( Util::Comparators::ComparatorState newComparatorState ) override;
+			void _main() override;
+
 
 			virtual ~DaytimesClosed() {}
 	};

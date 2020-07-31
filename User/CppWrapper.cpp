@@ -56,10 +56,6 @@ DaytimesClosed app(*&appBaseConfig);
 void handleButtonDown(Button& button);
 
 
-//#define OPEN_RELAY_TIMER_MINUTES  0 * (60 * 1000) /*TODO*/
-//static SoftTimer  openRelayTimer(OPEN_RELAY_TIMER_MINUTES, false, handleOpenRelayTimer);
-
-
 
 extern "C" void doCpp(void) {
 	// Perform software tests
@@ -77,7 +73,6 @@ extern "C" void doCpp(void) {
 		RelayHandler::main();
 		app.main();
 		button.main();
-//		openRelayTimer.main();
 	}
 }
 
@@ -95,25 +90,3 @@ void handleButtonDown(Button& button) {
 		RelayHandler::enqueueDelayCommand(700);
 	}
 }
-
-
-//void handleButtonUp(Button& button) {
-//	const RelayState newRelayState = !RelayHandler::getRelayState();
-//	RelayHandler::enqueueOpenCloseCommand(newRelayState);
-//	handleRelayChangeDueToBrightness(newRelayState);
-//}
-
-
-//void handleOpenRelayTimer() {
-//	openRelayTimer.disable();
-//	RelayHandler::enqueueOpenCommand();
-//}
-
-
-
-//void handleRelayChangeDueToBrightness(RelayState newRelayState) {
-//	if (newRelayState == RelayState::Closed)
-//		openRelayTimer.enable();
-//	else if (newRelayState == RelayState::Open)
-//		openRelayTimer.disable();
-//}

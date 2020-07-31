@@ -10,6 +10,8 @@
 
 #include "AppBase.h"
 
+#include <Stm32/SwoLogger/SwoLogger.h>
+
 namespace Apps {
 
 		AppBase::AppBase(AppBaseConfig &appBaseConfig) :
@@ -32,7 +34,10 @@ namespace Apps {
 			}
 
 			const bool comparatorStateChanged = _comparator.process(Hardware::Adc::getFilteredMeasuring_PhotoVoltage());
-			if ( comparatorStateChanged )   handleBrightnessComparatorEvent(_comparator.getState());
+			if ( comparatorStateChanged ) {
+				Util::Stm32::SwoLogger::log("BrightnessComparator event");
+				handleBrightnessComparatorEvent(_comparator.getState());
+			}
 		}
 
 		void AppBase::handleButtonUp() {
