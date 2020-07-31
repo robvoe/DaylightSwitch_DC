@@ -27,10 +27,10 @@
 // Include project specific modules
 #include "Hardware/Adc/Adc.h"
 #include "Hardware/RelayHandler/RelayHandler.h"
-#include "Hardware/BrightnessHandler/BrightnessHandler.h"
 
 // Include apps
 #include "Apps/AppBase.h"
+#include "Apps/AppBaseConfig.h"
 #include "Apps/DaytimesClosed.h"
 
 
@@ -46,18 +46,14 @@ using namespace Util::Stm32::ButtonDriver;
 // Instantiate persistent storages
 PersistentStorage<AdcConfig>                 adcConfig(AdcConfig::ResetData);
 PersistentStorage<RelayHandlerConfig>        relayHandlerConfig(RelayHandlerConfig::ResetData);
-PersistentStorage<BrightnessHandlerConfig>   brightnessConfig(BrightnessHandlerConfig::ResetData);
+PersistentStorage<AppBaseConfig>             appBaseConfig(AppBaseConfig::ResetData);
 
 // Instantiate app
-DaytimesClosed app{};
+DaytimesClosed app(*&appBaseConfig);
 
 
 
-void handleHoldImpulse(Button& button);
-//void handleButtonUp(Button& button);
-//void handleOpenRelayTimer();
-//void handleRelayChangeDueToBrightness(RelayState newRelayState);
-
+void handleButtonDown(Button& button);
 
 
 //#define OPEN_RELAY_TIMER_MINUTES  0 * (60 * 1000) /*TODO*/
@@ -73,14 +69,12 @@ extern "C" void doCpp(void) {
 	// Init all necessary modules
 	Adc::init(&adcConfig);
 	RelayHandler::init(&relayHandlerConfig);
-	BrightnessHandler::init(&brightnessConfig, [](Util::Comparators::ComparatorState s){app.handleBrightnessComparatorEvent(s);});
-	Button  button(TASTER_GPIO_Port, TASTER_Pin, GPIO_PinState::GPIO_PIN_SET, true, handleHoldImpulse, [](Button&){app.handleButtonUp();});
+	Button  button(TASTER_GPIO_Port, TASTER_Pin, GPIO_PinState::GPIO_PIN_SET, true, handleButtonDown, [](Button&){app.handleButtonUp();});
 
 	// Main loop
 	while(1) {
 		Adc::main();
 		RelayHandler::main();
-		BrightnessHandler::main();
 		app.main();
 		button.main();
 //		openRelayTimer.main();
@@ -88,10 +82,10 @@ extern "C" void doCpp(void) {
 }
 
 
-void handleHoldImpulse(Button& button) {
+void handleButtonDown(Button& button) {
 	if ( !button.State.isHoldImpulse() )  return;
-	brightnessConfig->deduceCompareVoltage(Adc::getFilteredMeasuring_PhotoVoltage());
-	brightnessConfig.saveToFlash();
+	appBaseConfig->deduceCompareVoltage(Adc::getFilteredMeasuring_PhotoVoltage());
+	appBaseConfig.saveToFlash();
 
 	// Now give feedback by switching the relay several times
 	RelayState relayState = RelayHandler::getRelayState();

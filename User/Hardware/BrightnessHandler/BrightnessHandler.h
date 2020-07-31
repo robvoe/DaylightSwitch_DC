@@ -11,7 +11,6 @@
 #define APPLICATION_USER_HARDWARE_BRIGHTNESSHANDLER_BRIGHTNESSHANDLER_H_
 
 #include <Comparators/SingleComparator.h>
-#include "BrightnessHandlerConfig.h"
 
 #include "../RelayHandler/Definitions.h"
 
@@ -28,8 +27,6 @@ namespace Hardware {
 			BrightnessHandler(const BrightnessHandler&) = delete;
 
 			static BrightnessComparatorEventCallbackDefinition  _brightnessComparatorEventCallback;
-			static BrightnessHandlerConfig                     *_config;
-			static Util::Comparators::SingleComparator<float>   _comparator;
 
 			/**
 			 * Internally used function. Calls, if possible, the 'brightness changed' callback.
@@ -44,7 +41,7 @@ namespace Hardware {
 			 * @param config                             ..  Contains the configuration. Must not be null!
 			 * @param brightnessComparatorEventCallback  ..  May hold a callback that gets called as soon as the brightness comparator output changes. May be nullptr.
 			 */
-			static void init( BrightnessHandlerConfig *config, BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback = nullptr );
+//			static void init( BrightnessHandlerConfig *config, BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback = nullptr );
 
 			/**
 			 * Main function of the BrightnessComparatorHandler module. Must be called cyclically from main loop.

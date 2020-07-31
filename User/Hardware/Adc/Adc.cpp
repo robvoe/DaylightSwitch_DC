@@ -113,9 +113,10 @@ namespace Hardware {
 				static uint32_t inhibit = {0};
 				inhibit++;
 				if ( inhibit >= 19 ) {
-					inhibit = {9};
-					Stm32::SwoLogger::debug("V_Photo ", _averageFilter_PhotoVoltage.getOutput());
-					Stm32::SwoLogger::debug("V_Supply ", _averageFilter_SupplyVoltage.getOutput());
+					inhibit = {0};
+					using namespace Util::Stm32;
+					SwoLogger::log("V_Photo ", _averageFilter_PhotoVoltage.getOutput());
+					SwoLogger::log("V_Supply ", _averageFilter_SupplyVoltage.getOutput());
 				}
 			}
 		}

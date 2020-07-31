@@ -78,7 +78,7 @@ namespace Hardware {
 					HAL_GPIO_WritePin( RELAY_CLOSE_GPIO_Port, RELAY_CLOSE_Pin, GPIO_PIN_RESET );
 					HAL_GPIO_WritePin( RELAY_OPEN_GPIO_Port, RELAY_OPEN_Pin, GPIO_PIN_RESET );
 					_currentRelayState = (nextCommand->Command == RelayCommand::Command::Open) ? RelayState::Open : RelayState::Closed;
-					Stm32::SwoLogger::info((nextCommand->Command == RelayCommand::Command::Open) ?  "New relay state: Open" : "New relay state: Closed");
+					Util::Stm32::SwoLogger::log((nextCommand->Command == RelayCommand::Command::Open) ?  "New relay state: Open" : "New relay state: Closed");
 					postprocessRemoveCommand();
 				}
 			}

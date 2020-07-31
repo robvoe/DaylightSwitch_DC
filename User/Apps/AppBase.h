@@ -10,13 +10,16 @@
 #ifndef APPLICATION_USER_APPS_APPBASE_H_
 #define APPLICATION_USER_APPS_APPBASE_H_
 
-#include <string>
 
-#include <Comparators/ComparatorBase.h>
+#include <Comparators/SingleComparator.h>
 #include <Stm32/SwoLogger/SwoLogger.h>
+#include <Mutex/ArmInterruptPreventionMutex.h>
 
 #include "Hardware/RelayHandler/RelayHandler.h"
 #include "Hardware/RelayHandler/Definitions.h"
+#include "Hardware/Adc/Adc.h"
+
+#include "AppBaseConfig.h"
 
 
 namespace Apps {
@@ -25,31 +28,38 @@ namespace Apps {
 	 * Defines the application base. Cannot be instantiated.
 	 */
 	class AppBase {
+		private:
+			AppBaseConfig&                              _config;
+			Util::Comparators::SingleComparator<float>  _comparator;
+
+
+
 		protected:
 			/********************************* CONSTRUCTORS ********************************/
 			
 			/**
 			 * Constructor. Protected modifier prevents from being instantiated.
 			 */
-			AppBase() {};
+			AppBase(AppBaseConfig &appBaseConfig);
 
 			/********************************* GENERAL LOGIC *******************************/
-		public:
 
-			virtual void main() {}
-
-			virtual void handleButtonUp() {
-				using namespace Hardware;
-				const RelayState newRelayState = !RelayHandler::getRelayState();
-				RelayHandler::enqueueOpenCloseCommand(newRelayState);
-				Stm32::SwoLogger::info("Button up event");
-			}
-
+			/** Gets called as soon as the brightness comparator changes its state. Must be implemented by the application. */
 			virtual void handleBrightnessComparatorEvent( Util::Comparators::ComparatorState newComparatorState ) = 0;
 
-			/**
-			 * Destructor.
-			 */
+		public:
+
+			/** Must be called from main-loop. */
+			void main();
+
+			/** May be implemented by the application so it gets called cyclically. */
+			virtual void _main() {}
+
+			/** Must be called from "outside" in case the button was released. */
+			virtual void handleButtonUp();
+
+
+			/** Destructor */
 			virtual ~AppBase() {}
 
 	};

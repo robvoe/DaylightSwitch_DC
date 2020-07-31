@@ -18,45 +18,45 @@
 namespace Hardware {
 
 	BrightnessHandler::BrightnessComparatorEventCallbackDefinition BrightnessHandler::_brightnessComparatorEventCallback = nullptr;
-	BrightnessHandlerConfig                                       *BrightnessHandler::_config = nullptr;
-	Util::Comparators::SingleComparator<float>                     BrightnessHandler::_comparator(0.0f, 0.0f, Util::Comparators::ComparatorState::Undefined);
+//	BrightnessHandlerConfig                                       *BrightnessHandler::_config = nullptr;
+
 
 	using namespace Util::Comparators;
 
 
-	void BrightnessHandler::init( BrightnessHandlerConfig *config, BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback ) {
-		_config = config;
-		_brightnessComparatorEventCallback = brightnessComparatorEventCallback;
-		_comparator.CompareValue = config->CompareVoltage;
-		_comparator.CompareHysteresis = config->HysteresisVoltage;
-	}
-
-	void BrightnessHandler::main() {
-		if ( !Adc::isValidMeasurings() ) {
-			return;
-		}
-
-		// Synchronize 'config' fields to comparator
-		if ( _config->CompareVoltage != _comparator.CompareValue  ||  _config->HysteresisVoltage != _comparator.CompareHysteresis ) {
-			Util::Mutex::ArmInterruptPreventionMutex mutex;  // --> Prevent interrupts so copy process will be performed "in one go"
-			_comparator.CompareValue = _config->CompareVoltage;
-			_comparator.CompareHysteresis = _config->HysteresisVoltage;
-		}
-
-		const bool comparatorStateChanged = _comparator.process(Adc::getFilteredMeasuring_PhotoVoltage());
-		if ( comparatorStateChanged ) {
-			volatile BrightnessComparatorEventCallbackDefinition callback = _brightnessComparatorEventCallback;
-			if ( callback != nullptr )  callback( _comparator.getState() );
-		}
-
-	}
-
-	void BrightnessHandler::setBrightnessComparatorEventCallback(BrightnessHandler::BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback) {
-		_brightnessComparatorEventCallback = brightnessComparatorEventCallback;
-	}
-
-	Util::Comparators::ComparatorState BrightnessHandler::getComparatorState() {
-		return _comparator.getState();
-	}
+//	void BrightnessHandler::init( BrightnessHandlerConfig *config, BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback ) {
+//		_config = config;
+//		_brightnessComparatorEventCallback = brightnessComparatorEventCallback;
+//		_comparator.CompareValue = config->CompareVoltage;
+//		_comparator.CompareHysteresis = config->HysteresisVoltage;
+//	}
+//
+//	void BrightnessHandler::main() {
+//		if ( !Adc::isValidMeasurings() ) {
+//			return;
+//		}
+//
+//		// Synchronize 'config' fields to comparator
+//		if ( _config->CompareVoltage != _comparator.CompareValue  ||  _config->HysteresisVoltage != _comparator.CompareHysteresis ) {
+//			Util::Mutex::ArmInterruptPreventionMutex mutex;  // --> Prevent interrupts so copy process will be performed "in one go"
+//			_comparator.CompareValue = _config->CompareVoltage;
+//			_comparator.CompareHysteresis = _config->HysteresisVoltage;
+//		}
+//
+//		const bool comparatorStateChanged = _comparator.process(Adc::getFilteredMeasuring_PhotoVoltage());
+//		if ( comparatorStateChanged ) {
+//			volatile BrightnessComparatorEventCallbackDefinition callback = _brightnessComparatorEventCallback;
+//			if ( callback != nullptr )  callback( _comparator.getState() );
+//		}
+//
+//	}
+//
+//	void BrightnessHandler::setBrightnessComparatorEventCallback(BrightnessHandler::BrightnessComparatorEventCallbackDefinition brightnessComparatorEventCallback) {
+//		_brightnessComparatorEventCallback = brightnessComparatorEventCallback;
+//	}
+//
+//	Util::Comparators::ComparatorState BrightnessHandler::getComparatorState() {
+//		return _comparator.getState();
+//	}
 
 } /* namespace Hardware */

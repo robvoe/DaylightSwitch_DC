@@ -30,7 +30,7 @@ namespace Apps {
 
 			/********************************* CONSTRUCTORS ********************************/
 
-			DaytimesClosed() noexcept {
+			DaytimesClosed(AppBaseConfig &appBaseConfig) : AppBase(appBaseConfig) {
 				// TODO
 			}
 			
