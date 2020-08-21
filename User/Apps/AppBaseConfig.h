@@ -18,8 +18,8 @@
 
 
 struct AppBaseConfig {
-		static constexpr float InitialCompareVoltage = 0.6f;
-		static constexpr float InitialHysteresisVoltage = 0.2f;
+		static constexpr float InitialCompareVoltage = 1.0f;
+		static constexpr float InitialHysteresisVoltage = 0.3f;
 
 		static constexpr float MinSwitchBackVoltage = 0.05f;  // Should be slightly higher than the OpAmp's lower rail voltage.
 		static constexpr float MaxCompareVoltage = 3.25f;

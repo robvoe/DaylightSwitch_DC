@@ -117,6 +117,7 @@ namespace Hardware {
 					using namespace Util::Stm32;
 					SwoLogger::log("V_Photo ", _averageFilter_PhotoVoltage.getOutput());
 					SwoLogger::log("V_Supply ", _averageFilter_SupplyVoltage.getOutput());
+					SwoLogger::log("V_Relay ", _averageFilter_RelayVoltage.getOutput());
 				}
 			}
 		}
@@ -151,6 +152,12 @@ namespace Hardware {
 
 	bool Adc::isValidMeasurings() {
 		return !_averageFilter_SupplyVoltage.containsEmptyElements();  // We could have chosen any of the other filters here instead..
+	}
+
+	void Adc::invalidateMeasurings() {
+		_averageFilter_SupplyVoltage.invalidate();
+		_averageFilter_PhotoVoltage.invalidate();
+		_averageFilter_RelayVoltage.invalidate();
 	}
 
 

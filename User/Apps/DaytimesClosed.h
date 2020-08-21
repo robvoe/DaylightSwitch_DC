@@ -16,6 +16,8 @@
 
 #include <Stm32/SoftTimer/SoftTimer.h>
 
+#include "Hardware/RelayHandler/RelayHandler.h"
+
 namespace Apps {
 	
 	/**
@@ -28,12 +30,11 @@ namespace Apps {
 
 			/********************************** CONSTANTS **********************************/
 
-			static constexpr uint32_t  OpenRelayTimerMillis = 30 /*minutes*/ * (60 * 1000);
-			static constexpr bool      UseOpenRelayTimer = false;
+			static constexpr uint32_t  OpenRelayTimerMillis_Bright = 120 /*minutes*/ * (60 * 1000);  ///< This timer gets enabled by BrightnessComparatorEvent or by ButtonEvent
+			static constexpr uint32_t  OpenRelayTimerMillis_Dark   =  30 /*minutes*/ * (60 * 1000);  ///< This timer gets enabled by ButtonEvent
+			static constexpr bool      UseOpenRelayTimer_Bright = true;
+			static constexpr bool      UseOpenRelayTimer_Dark   = true;
 
-			/*********************************** FIELDS ************************************/
-
-			Util::Stm32::SoftTimer _openRelayTimer;
 
 			/********************************* CONSTRUCTORS ********************************/
 
@@ -44,13 +45,31 @@ namespace Apps {
 			
 			/******************************** GETTERS/SETTERS ******************************/
 			
-			/********************************* GENERAL LOGIC *******************************/
+
+			/******************************** OVERRIDDEN LOGIC *****************************/
 
 			void handleBrightnessComparatorEvent( Util::Comparators::ComparatorState newComparatorState ) override;
 			void _main() override;
+			Hardware::RelayState handleButtonUp() override;
+
 
 
 			virtual ~DaytimesClosed() {}
+
+		private:
+			/*********************************** FIELDS ************************************/
+
+			Util::Stm32::SoftTimer _openRelayTimer_Bright;
+			Util::Stm32::SoftTimer _openRelayTimer_Dark;
+
+			/********************************* GENERAL LOGIC *******************************/
+
+//			enum class EventType {
+//				ButtonUp, BrightnessComparator
+//			};
+
+			void handleTimers(Hardware::RelayState newRelayState);
+
 	};
 
 } /* namespace Apps */

@@ -32,6 +32,7 @@
 #include "Apps/AppBase.h"
 #include "Apps/AppBaseConfig.h"
 #include "Apps/DaytimesClosed.h"
+#include "Apps/NighttimesClosed.h"
 
 
 
@@ -49,7 +50,7 @@ PersistentStorage<RelayHandlerConfig>        relayHandlerConfig(RelayHandlerConf
 PersistentStorage<AppBaseConfig>             appBaseConfig(AppBaseConfig::ResetData);
 
 // Instantiate app
-DaytimesClosed app(*&appBaseConfig);
+NighttimesClosed app(*&appBaseConfig);
 
 
 
@@ -81,12 +82,13 @@ void handleButtonDown(Button& button) {
 	if ( !button.State.isHoldImpulse() )  return;
 	appBaseConfig->deduceCompareVoltage(Adc::getFilteredMeasuring_PhotoVoltage());
 	appBaseConfig.saveToFlash();
+	SwoLogger::log("Saved new P_Photo compare value");
 
 	// Now give feedback by switching the relay several times
 	RelayState relayState = RelayHandler::getRelayState();
 	for ( uint32_t i = 0; i<4; i++ ) {
 		relayState = !relayState;
 		RelayHandler::enqueueOpenCloseCommand(relayState);
-		RelayHandler::enqueueDelayCommand(700);
+		RelayHandler::enqueueDelayCommand(800);
 	}
 }

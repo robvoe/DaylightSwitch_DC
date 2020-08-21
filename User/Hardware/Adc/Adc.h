@@ -84,6 +84,11 @@ namespace Hardware {
 			 */
 			static bool isValidMeasurings();
 
+			/**
+			 * Invalidates all measurings until old filter values were overwritten by new ones.
+			 */
+			static void invalidateMeasurings();
+
 
 			/// Getter functions for corrected measurings
 			static float getFilteredMeasuring_RelayVoltage();

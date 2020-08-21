@@ -40,12 +40,17 @@ namespace Apps {
 			}
 		}
 
-		void AppBase::handleButtonUp() {
+		Hardware::RelayState AppBase::handleButtonUp() {
 			using namespace Hardware;
 			using namespace Util::Stm32;
 			const RelayState newRelayState = !RelayHandler::getRelayState();
 			RelayHandler::enqueueOpenCloseCommand(newRelayState);
 			SwoLogger::log("Button up event");
+			return newRelayState;
+		}
+
+		Util::Comparators::ComparatorState AppBase::getBrightnessComparatorState() {
+			return _comparator.getState();
 		}
 
 

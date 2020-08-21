@@ -79,6 +79,7 @@ namespace Hardware {
 					HAL_GPIO_WritePin( RELAY_OPEN_GPIO_Port, RELAY_OPEN_Pin, GPIO_PIN_RESET );
 					_currentRelayState = (nextCommand->Command == RelayCommand::Command::Open) ? RelayState::Open : RelayState::Closed;
 					Util::Stm32::SwoLogger::log((nextCommand->Command == RelayCommand::Command::Open) ?  "New relay state: Open" : "New relay state: Closed");
+					Adc::invalidateMeasurings();  // Makes sure we see "fresh" voltages in case there is an open/close command right afterwards
 					postprocessRemoveCommand();
 				}
 			}

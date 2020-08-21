@@ -55,12 +55,17 @@ namespace Apps {
 			/** May be implemented by the application so it gets called cyclically. */
 			virtual void _main() {}
 
-			/** Must be called from "outside" in case the button was released. */
-			virtual void handleButtonUp();
+			/** Must be called from "outside" in case the button was released. Returns the new relay state. */
+			virtual Hardware::RelayState handleButtonUp();
 
 
 			/** Destructor */
 			virtual ~AppBase() {}
+
+		protected:
+
+			/** Returns current state of BrightnessComparator. */
+			Util::Comparators::ComparatorState getBrightnessComparatorState();
 
 	};
 
